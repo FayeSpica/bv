@@ -1,9 +1,10 @@
 name: Alpha Build
 
 on:
-  push:
-    branches:
-      - develop
+  workflow_dispatch:
+    inputs:
+      google_services_json:
+        description: "google-services.json (optional)"
 
 jobs:
   build-alpha:
