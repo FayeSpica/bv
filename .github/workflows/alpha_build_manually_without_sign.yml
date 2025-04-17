@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: develop
+          ref: s
           fetch-depth: 0
           submodules: 'true'
 
@@ -24,11 +24,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-
-      - name: Write google-services.json
-        env:
-          DATA: ${{ github.event.inputs.google_services_json }}
-        run: echo $DATA > app/google-services.json
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
