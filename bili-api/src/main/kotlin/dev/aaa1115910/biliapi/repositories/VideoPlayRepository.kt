@@ -22,8 +22,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
+import org.koin.core.annotation.Single
 import bilibili.pgc.gateway.player.v2.PlayURLGrpcKt as PgcPlayURLGrpcKt
 
+@Single
 class VideoPlayRepository(
     private val authRepository: AuthRepository,
     private val channelRepository: ChannelRepository
@@ -110,8 +112,8 @@ class VideoPlayRepository(
     }
 
     suspend fun getPgcPlayData(
-        aid: Long,
-        cid: Long,
+        aid: Long?,
+        cid: Long?,
         epid: Int,
         preferCodec: CodeType = CodeType.NoCode,
         preferApiType: ApiType = ApiType.Web,
@@ -125,6 +127,7 @@ class VideoPlayRepository(
                     BiliHttpProxyApi.getPgcVideoPlayUrl(
                         av = aid,
                         cid = cid,
+                        epid = epid,
                         fnval = 4048,
                         qn = 127,
                         fnver = 0,
@@ -156,7 +159,7 @@ class VideoPlayRepository(
                     val replies = codecTypes.map { codecType ->
                         val req = playViewReq {
                             this.epid = epid.toLong()
-                            this.cid = cid
+                            cid?.let { this.cid = it }
                             qn = 127
                             fnver = 0
                             fnval = 4048

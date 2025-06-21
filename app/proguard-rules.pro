@@ -109,6 +109,10 @@
 # kotlin-logging
 -dontwarn ch.qos.logback.classic.Level
 -dontwarn ch.qos.logback.classic.Logger
+-dontwarn ch.qos.logback.classic.LoggerContext
 -dontwarn ch.qos.logback.classic.spi.ILoggingEvent
 -dontwarn ch.qos.logback.classic.spi.LogbackServiceProvider
 -dontwarn ch.qos.logback.classic.spi.LoggingEvent
+
+# geetest
+-keep class com.geetest.sdk.** {*;}
