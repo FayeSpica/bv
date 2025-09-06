@@ -33,11 +33,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.aaa1115910.bv.util.countDownTimer
-import io.github.g0dkar.qrcode.QRCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import qrcode.QRCode
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
@@ -47,7 +47,8 @@ fun QrImage(
     modifier: Modifier = Modifier,
     content: String,
     borderWidth: Dp = 24.dp,
-    shape: Shape = MaterialTheme.shapes.large
+    shape: Shape = MaterialTheme.shapes.large,
+    showLoadingWhenContentChanged: Boolean = true
 ) {
     val scope = rememberCoroutineScope()
     var qrImage by remember { mutableStateOf(ImageBitmap(1, 1, ImageBitmapConfig.Argb8888)) }
@@ -67,7 +68,7 @@ fun QrImage(
     LaunchedEffect(content) {
         qrJob?.cancel()
         qrJob = scope.launch(Dispatchers.Default) {
-            qrGenerated = false
+            if (showLoadingWhenContentChanged) qrGenerated = false
             if (content.isNotBlank()) createQr()
         }
     }

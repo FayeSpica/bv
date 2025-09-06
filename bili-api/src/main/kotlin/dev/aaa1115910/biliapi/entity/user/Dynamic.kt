@@ -4,6 +4,7 @@ import bilibili.app.dynamic.v2.DynModuleType
 import bilibili.app.dynamic.v2.Module
 import bilibili.app.dynamic.v2.ModuleDynamic.ModuleItemCase
 import bilibili.app.dynamic.v2.Paragraph
+import bilibili.app.dynamic.v2.VideoType
 import dev.aaa1115910.biliapi.entity.Picture
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.SerialName
@@ -376,10 +377,13 @@ data class DynamicItem(
             fun fromModuleDynamic(moduleDynamic: dev.aaa1115910.biliapi.http.entity.dynamic.DynamicItem.Modules.Dynamic) =
                 DynamicDrawModule(
                     title = null,
-                    text = moduleDynamic.desc!!.text,
-                    images = moduleDynamic.major!!.draw!!.items
-                        .map(Picture::fromPicture)
-                        .distinctBy { it.url }
+                    text = moduleDynamic.desc?.text
+                        ?: moduleDynamic.major?.opus?.summary?.text
+                        ?: "empty text",
+                    images = (moduleDynamic.major!!.draw?.items?.map(Picture::fromPicture)
+                        ?: moduleDynamic.major.opus?.pics?.map(Picture::fromPicture))
+                        ?.distinctBy { it.url }
+                        ?: emptyList()
                 )
 
             fun fromModuleOpusSummaryAndModuleDynamic(
@@ -466,7 +470,9 @@ data class DynamicItem(
         companion object {
             fun fromModuleDynamic(moduleDynamic: dev.aaa1115910.biliapi.http.entity.dynamic.DynamicItem.Modules.Dynamic) =
                 DynamicWordModule(
-                    text = moduleDynamic.desc!!.text
+                    text = moduleDynamic.major?.opus?.summary?.text
+                        ?: moduleDynamic.desc?.text
+                        ?: "empty content"
                 )
 
             fun fromModuleOpusSummary(moduleOpusSummary: bilibili.app.dynamic.v2.ModuleOpusSummary) =
@@ -679,7 +685,7 @@ data class DynamicItem(
                     aid = moduleDynamic.aid,
                     bvid = moduleDynamic.bvid,
                     cover = moduleDynamic.cover,
-                    desc = moduleDynamic.desc,
+                    desc = moduleDynamic.desc ?: "empty description",
                     duration = moduleDynamic.durationText,
                     url = moduleDynamic.jumpUrl,
                     play = moduleDynamic.stat.play,
@@ -778,7 +784,7 @@ data class DynamicVideo(
                 item.modulesList.first { it.moduleType == DynModuleType.module_dynamic }.moduleDynamic
             val desc =
                 item.modulesList.firstOrNull { it.moduleType == DynModuleType.module_desc }?.moduleDesc
-            val isDynamicVideo = desc?.text?.startsWith("动态视频") ?: false
+            val isDynamicVideo = dynamic.dynArchive?.stype == VideoType.video_type_dynamic
             when (dynamic.moduleItemCase) {
                 ModuleItemCase.DYN_ARCHIVE -> {
                     val archive = dynamic.dynArchive
@@ -786,7 +792,9 @@ data class DynamicVideo(
                         aid = archive.avid,
                         bvid = archive.bvid,
                         cid = archive.cid,
-                        title = if (!isDynamicVideo) archive.title else desc!!.text.substring(5),
+                        title = if (!isDynamicVideo) archive.title else {
+                            desc?.text?.replace("动态视频｜", "") ?: "NO TITLE"
+                        },
                         cover = archive.cover,
                         author = author.name,
                         duration = convertStringTimeToSeconds(archive.coverLeftText1),
@@ -810,6 +818,22 @@ data class DynamicVideo(
                         duration = convertStringTimeToSeconds(pgc.coverLeftText1),
                         play = convertStringPlayCountToNumberPlayCount(pgc.coverLeftText2),
                         danmaku = convertStringPlayCountToNumberPlayCount(pgc.coverLeftText3),
+                        avatar = author.face
+                    )
+                }
+
+                ModuleItemCase.DYN_CHARGING_ARCHIVE -> {
+                    val chargingArchiveInfo = dynamic.dynChargingArchive.archiveInfo
+                    return DynamicVideo(
+                        aid = chargingArchiveInfo.avid,
+                        bvid = chargingArchiveInfo.bvid,
+                        cid = chargingArchiveInfo.cid,
+                        title = chargingArchiveInfo.title,
+                        cover = chargingArchiveInfo.cover,
+                        author = author.name,
+                        duration = convertStringTimeToSeconds(chargingArchiveInfo.coverLeftText1),
+                        play = convertStringPlayCountToNumberPlayCount(chargingArchiveInfo.coverLeftText2),
+                        danmaku = convertStringPlayCountToNumberPlayCount(chargingArchiveInfo.coverLeftText3),
                         avatar = author.face
                     )
                 }
