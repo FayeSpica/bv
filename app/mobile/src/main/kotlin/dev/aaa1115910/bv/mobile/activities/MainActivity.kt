@@ -10,6 +10,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import dev.aaa1115910.bv.mobile.screen.MobileMainScreen
 import dev.aaa1115910.bv.mobile.screen.RegionBlockScreen
 import dev.aaa1115910.bv.mobile.theme.BVMobileTheme
@@ -24,6 +27,7 @@ class MainActivity : ComponentActivity() {
             setKeepOnScreenCondition { keepSplashScreen }
         }
         super.onCreate(savedInstanceState)
+        enableImmersiveMode()
 
         setContent {
             val scope = rememberCoroutineScope()
@@ -48,5 +52,18 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun enableImmersiveMode() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        val controller = WindowInsetsControllerCompat(window, window.decorView)
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        controller.hide(WindowInsetsCompat.Type.statusBars())
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) enableImmersiveMode()
     }
 }
