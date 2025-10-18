@@ -153,6 +153,7 @@ dependencies {
     api(libs.qrcode)
     api(libs.rememberPreference)
     api(libs.slf4j.android.mvysny)
+    api(libs.zxing)
     api(project(mapOf("path" to ":bili-api")))
     api(project(mapOf("path" to ":bili-subtitle")))
     api(project(mapOf("path" to ":player")))
