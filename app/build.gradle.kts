@@ -172,7 +172,6 @@ java {
 }
 
 dependencies {
-    implementation(project(":app:mobile"))
     implementation(project(":app:tv"))
 }
 
