@@ -55,7 +55,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun MainScreen2(
+fun MainScreen(
     modifier: Modifier = Modifier,
     recommendViewModel: RecommendViewModel = koinViewModel(),
     popularViewModel: PopularViewModel = koinViewModel(),
@@ -63,7 +63,7 @@ fun MainScreen2(
     userViewModel: UserViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    val logger = KotlinLogging.logger("MainScreen2")
+    val logger = KotlinLogging.logger("MainScreen")
     var showUserPanel by remember { mutableStateOf(false) }
     var lastPressBack: Long by remember { mutableLongStateOf(0L) }
     var selectedDrawerItem by remember { mutableStateOf(DrawerItem.Home) }
@@ -131,7 +131,7 @@ fun MainScreen2(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 140.dp) // 为drawer留出空间
+                .padding(start = 60.dp) // 为drawer留出空间
         ) {
             AnimatedContent(
                 targetState = selectedDrawerItem,
