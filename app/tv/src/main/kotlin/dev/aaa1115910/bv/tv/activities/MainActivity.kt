@@ -12,7 +12,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import dev.aaa1115910.bv.repository.UserRepository
-import dev.aaa1115910.bv.tv.screens.MainScreen
+import dev.aaa1115910.bv.tv.screens.MainScreen2
 import dev.aaa1115910.bv.tv.screens.RegionBlockScreen
 import dev.aaa1115910.bv.tv.screens.user.lock.UnlockUserScreen
 import dev.aaa1115910.bv.ui.theme.BVTheme
@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
                 } else {
                     //HomeScreen()
                     if (!userLockLocked) {
-                        MainScreen()
+                        MainScreen2()
                     } else {
                         UnlockUserScreen(
                             onUnlockSuccess = { user ->
