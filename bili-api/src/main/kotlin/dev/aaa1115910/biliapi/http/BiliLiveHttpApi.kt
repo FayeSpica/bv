@@ -3,6 +3,7 @@ package dev.aaa1115910.biliapi.http
 import dev.aaa1115910.biliapi.http.entity.BiliResponse
 import dev.aaa1115910.biliapi.http.entity.live.DanmuInfoData
 import dev.aaa1115910.biliapi.http.entity.live.HistoryDanmaku
+import dev.aaa1115910.biliapi.http.entity.live.LiveFollowingData
 import dev.aaa1115910.biliapi.http.entity.live.LiveStreamUrlData
 import dev.aaa1115910.biliapi.http.entity.live.RoomPlayInfoData
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -14,6 +15,7 @@ import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.http.URLProtocol
 import io.ktor.serialization.kotlinx.json.json
@@ -93,6 +95,27 @@ object BiliLiveHttpApi {
             parameter("qn", qn)
             parameter("platform", platform)
             parameter("ptype", 8)
+        }.body()
+
+    /**
+     * 获取关注的正在直播的主播列表
+     * @param page 页码，从1开始
+     * @param pageSize 每页数量，默认9
+     * @return 关注的直播列表
+     * 
+     * 注意：此API需要登录，未登录会返回 code=-101
+     * 
+     * @see [B站API文档](https://github.com/SocialSisterYi/bilibili-API-collect/blob/master/docs/live/user.md)
+     */
+    suspend fun getLiveFollowing(
+        page: Int = 1,
+        pageSize: Int = 9
+    ): BiliResponse<LiveFollowingData> =
+        client.get("/xlive/web-ucenter/user/following") {
+            parameter("page", page)
+            parameter("page_size", pageSize)
+            parameter("ignoreRecord", 1)
+            parameter("hit_ab", true)
         }.body()
 
 }
