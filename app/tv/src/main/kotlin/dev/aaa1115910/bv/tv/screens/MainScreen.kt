@@ -32,7 +32,6 @@ import androidx.tv.material3.DrawerValue
 import androidx.tv.material3.NavigationDrawer
 import androidx.tv.material3.rememberDrawerState
 import dev.aaa1115910.bv.R
-import dev.aaa1115910.bv.tv.component.UserPanel
 import dev.aaa1115910.bv.tv.activities.settings.SettingsActivity
 import dev.aaa1115910.bv.tv.activities.user.FavoriteActivity
 import dev.aaa1115910.bv.tv.activities.user.FollowingSeasonActivity
@@ -40,6 +39,7 @@ import dev.aaa1115910.bv.tv.activities.user.HistoryActivity
 import dev.aaa1115910.bv.tv.activities.user.LoginActivity
 import dev.aaa1115910.bv.tv.activities.user.ToViewActivity
 import dev.aaa1115910.bv.tv.activities.user.UserInfoActivity
+import dev.aaa1115910.bv.tv.component.UserPanel
 import dev.aaa1115910.bv.tv.screens.main.DrawerContent
 import dev.aaa1115910.bv.tv.screens.main.DrawerItem
 import dev.aaa1115910.bv.tv.screens.main.HomeContent

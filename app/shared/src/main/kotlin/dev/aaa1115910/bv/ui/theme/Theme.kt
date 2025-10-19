@@ -44,7 +44,9 @@ fun BVTheme(
 
     val tvLightColorScheme = lightColorScheme()
     val tvDarkColorScheme = darkColorScheme(
-        border = Color.White
+        border = Color.White,
+        background = Color(0xFF303030),
+        surface = Color(0xFF303030)
     )
     val mobileLightColorScheme = androidx.compose.material3.lightColorScheme()
     val mobileDarkColorScheme = androidx.compose.material3.darkColorScheme()

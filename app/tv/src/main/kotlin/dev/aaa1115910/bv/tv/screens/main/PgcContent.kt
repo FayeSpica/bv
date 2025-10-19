@@ -108,6 +108,7 @@ fun PgcContent(
 
     Scaffold(
         modifier = Modifier,
+        containerColor = androidx.tv.material3.MaterialTheme.colorScheme.background,
         topBar = {
             TopNav(
                 modifier = Modifier

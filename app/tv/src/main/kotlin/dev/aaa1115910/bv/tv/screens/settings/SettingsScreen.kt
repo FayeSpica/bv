@@ -68,6 +68,7 @@ fun SettingsScreen(
 
     Scaffold(
         modifier = modifier,
+        containerColor = androidx.tv.material3.MaterialTheme.colorScheme.background,
         topBar = {
             Box(
                 modifier = Modifier.padding(

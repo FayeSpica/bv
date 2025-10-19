@@ -215,6 +215,7 @@ fun UgcContent(
 
     Scaffold(
         modifier = modifier,
+        containerColor = androidx.tv.material3.MaterialTheme.colorScheme.background,
         topBar = {
             TopNav(
                 modifier = Modifier

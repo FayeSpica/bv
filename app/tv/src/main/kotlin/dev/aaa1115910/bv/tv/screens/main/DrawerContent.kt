@@ -89,59 +89,13 @@ fun NavigationDrawerScope.DrawerContent(
             },
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-
-        NavigationDrawerItem(
-            modifier = Modifier,
-            onClick = {
-                if (isLogin) {
-                    onShowUserPanel()
-                } else {
-                    onLogin()
-                }
-            },
-            selected = selectedItem == DrawerItem.User,
-            leadingContent = {
-                if (isLogin) {
-                    Surface(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape),
-                        colors = SurfaceDefaults.colors(
-                            containerColor = Color.Gray
-                        )
-                    ) {
-                        AsyncImage(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape),
-                            model = avatar,
-                            contentDescription = null,
-                            contentScale = ContentScale.FillBounds
-                        )
-                    }
-                } else {
-                    Icon(
-                        imageVector = DrawerItem.User.displayIcon,
-                        contentDescription = null
-                    )
-                }
-            }
-        ) {
-            Text(
-                modifier = Modifier
-                    .basicMarquee(),
-                text = if (isLogin) username
-                else DrawerItem.User.displayName,
-                maxLines = 1
-            )
-        }
         LazyColumn(
             modifier = Modifier.focusRestorer(centerFocusRequester),
             verticalArrangement = Arrangement.Center
         ) {
             listOf(
-                DrawerItem.Search,
                 DrawerItem.Home,
+                DrawerItem.Search,
                 DrawerItem.UGC,
                 DrawerItem.PGC,
             ).forEach { item ->
@@ -167,18 +121,65 @@ fun NavigationDrawerScope.DrawerContent(
                 }
             }
         }
-        NavigationDrawerItem(
-            modifier = Modifier,
-            onClick = onOpenSettings,
-            selected = false,
-            leadingContent = {
-                Icon(
-                    imageVector = DrawerItem.Settings.displayIcon,
-                    contentDescription = null
+        Column {
+            NavigationDrawerItem(
+                modifier = Modifier,
+                onClick = {
+                    if (isLogin) {
+                        onShowUserPanel()
+                    } else {
+                        onLogin()
+                    }
+                },
+                selected = selectedItem == DrawerItem.User,
+                leadingContent = {
+                    if (isLogin) {
+                        Surface(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape),
+                            colors = SurfaceDefaults.colors(
+                                containerColor = Color.Gray
+                            )
+                        ) {
+                            AsyncImage(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape),
+                                model = avatar,
+                                contentDescription = null,
+                                contentScale = ContentScale.FillBounds
+                            )
+                        }
+                    } else {
+                        Icon(
+                            imageVector = DrawerItem.User.displayIcon,
+                            contentDescription = null
+                        )
+                    }
+                }
+            ) {
+                Text(
+                    modifier = Modifier
+                        .basicMarquee(),
+                    text = if (isLogin) username
+                    else DrawerItem.User.displayName,
+                    maxLines = 1
                 )
             }
-        ) {
-            Text(text = DrawerItem.Settings.displayName)
+            NavigationDrawerItem(
+                modifier = Modifier,
+                onClick = onOpenSettings,
+                selected = false,
+                leadingContent = {
+                    Icon(
+                        imageVector = DrawerItem.Settings.displayIcon,
+                        contentDescription = null
+                    )
+                }
+            ) {
+                Text(text = DrawerItem.Settings.displayName)
+            }
         }
     }
 }
@@ -187,7 +188,7 @@ enum class DrawerItem(
     val displayName: String,
     val displayIcon: ImageVector
 ) {
-    User(displayName = "点击登录", displayIcon = Icons.Default.AccountCircle),
+    User(displayName = "登录", displayIcon = Icons.Default.AccountCircle),
     Search(displayName = "搜索", displayIcon = Icons.Default.Search),
     Home(displayName = "首页", displayIcon = Icons.Default.Home),
     UGC(displayName = "UGC", displayIcon = Icons.Default.OndemandVideo),
