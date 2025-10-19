@@ -1,16 +1,18 @@
 package dev.aaa1115910.bv.tv.screens.main
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
@@ -39,12 +41,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Icon
 import androidx.tv.material3.Surface
-import androidx.tv.material3.Text
 import coil.compose.AsyncImage
 import dev.aaa1115910.bv.ui.theme.BVTheme
 import dev.aaa1115910.bv.util.isDpadRight
 import dev.aaa1115910.bv.util.isKeyDown
-import kotlinx.coroutines.delay
 
 @Composable
 fun DrawerContent(
@@ -65,9 +65,7 @@ fun DrawerContent(
     // 处理选中项变化
     androidx.compose.runtime.LaunchedEffect(selectedItem) {
         tabMoved = false
-        delay(200)
         onDrawerItemChanged(selectedItem)
-        delay(200)
         tabMoved = true
     }
 
@@ -75,6 +73,10 @@ fun DrawerContent(
         modifier = modifier
             .width(60.dp)
             .fillMaxHeight()
+            .border(
+                border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.3f)),
+                shape = RoundedCornerShape(0.dp)
+            )
             .onPreviewKeyEvent { keyEvent ->
                 if (keyEvent.isDpadRight()) {
                     if (keyEvent.isKeyDown()) {
@@ -168,7 +170,7 @@ private fun DrawerItem(
                     mod
                 }
             }
-            .onFocusChanged { if (it.hasFocus && !isSelected) onItemClick() },
+            .onFocusChanged { },
         onClick = onItemClick,
         colors = androidx.tv.material3.ClickableSurfaceDefaults.colors()
     ) {
