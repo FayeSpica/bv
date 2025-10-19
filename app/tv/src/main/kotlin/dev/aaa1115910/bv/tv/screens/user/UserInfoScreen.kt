@@ -148,7 +148,14 @@ fun UserInfoScreen(
                                 R.string.play_time_history,
                                 (historyItem.progress * 1000L).formatHourMinSec(),
                                 (historyItem.duration * 1000L).formatHourMinSec()
-                            )
+                            ),
+                            type = when (historyItem.type) {
+                                dev.aaa1115910.biliapi.entity.user.HistoryItemType.Archive -> dev.aaa1115910.bv.entity.carddata.VideoCardType.Video
+                                dev.aaa1115910.biliapi.entity.user.HistoryItemType.Pgc -> dev.aaa1115910.bv.entity.carddata.VideoCardType.Season
+                                dev.aaa1115910.biliapi.entity.user.HistoryItemType.Live -> dev.aaa1115910.bv.entity.carddata.VideoCardType.Live
+                                else -> dev.aaa1115910.bv.entity.carddata.VideoCardType.Video
+                            },
+                            roomId = if (historyItem.type == dev.aaa1115910.biliapi.entity.user.HistoryItemType.Live) historyItem.oid else null
                         )
                     )
                 }

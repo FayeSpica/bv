@@ -3,6 +3,10 @@ package dev.aaa1115910.bv.entity.carddata
 import dev.aaa1115910.bv.util.formatHourMinSec
 import java.text.SimpleDateFormat
 
+enum class VideoCardType {
+    Video, Season, Live
+}
+
 data class VideoCardData(
     val avid: Long,
     val title: String,
@@ -19,6 +23,8 @@ data class VideoCardData(
     val epId: Int? = null,
     val pubTime: Int? = null,
     var pubTimeString: String = "",
+    val type: VideoCardType = VideoCardType.Video,
+    val roomId: Long? = null,  // 用于直播间
 ) {
     init {
         play?.let {

@@ -1,5 +1,7 @@
 package dev.aaa1115910.bv.tv.screens.user
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,8 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Text
 import dev.aaa1115910.bv.R
+import dev.aaa1115910.bv.entity.carddata.VideoCardType
 import dev.aaa1115910.bv.tv.component.videocard.SmallVideoCard
 import dev.aaa1115910.bv.entity.proxy.ProxyArea
+import dev.aaa1115910.bv.tv.activities.video.SeasonInfoActivity
 import dev.aaa1115910.bv.tv.activities.video.VideoInfoActivity
 import dev.aaa1115910.bv.viewmodel.user.HistoryViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -100,11 +104,29 @@ fun HistoryScreen(
                     SmallVideoCard(
                         data = history,
                         onClick = {
-                            VideoInfoActivity.actionStart(
-                                context = context,
-                                aid = history.avid,
-                                proxyArea = ProxyArea.checkProxyArea(history.title)
-                            )
+                            when (history.type) {
+                                VideoCardType.Video -> {
+                                    VideoInfoActivity.actionStart(
+                                        context = context,
+                                        aid = history.avid,
+                                        proxyArea = ProxyArea.checkProxyArea(history.title)
+                                    )
+                                }
+                                VideoCardType.Season -> {
+                                    SeasonInfoActivity.actionStart(
+                                        context = context,
+                                        seasonId = history.avid.toInt(),
+                                        proxyArea = ProxyArea.checkProxyArea(history.title)
+                                    )
+                                }
+                                VideoCardType.Live -> {
+                                    // 打开直播间链接
+                                    history.roomId?.let { roomId ->
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://live.bilibili.com/$roomId"))
+                                        context.startActivity(intent)
+                                    }
+                                }
+                            }
                         },
                         onFocus = {
                             currentIndex = index
