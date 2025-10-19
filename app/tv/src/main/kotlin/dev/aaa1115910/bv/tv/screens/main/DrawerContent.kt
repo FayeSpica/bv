@@ -73,7 +73,7 @@ fun DrawerContent(
 
     Box(
         modifier = modifier
-            .width(140.dp)
+            .width(60.dp)
             .fillMaxHeight()
             .onPreviewKeyEvent { keyEvent ->
                 if (keyEvent.isDpadRight()) {
@@ -88,7 +88,7 @@ fun DrawerContent(
         Column(
             modifier = Modifier
                 .fillMaxHeight()
-                .padding(12.dp),
+                .padding(6.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             // 顶部导航项
@@ -159,7 +159,7 @@ private fun DrawerItem(
 ) {
     Surface(
         modifier = modifier
-            .width(116.dp)
+            .width(60.dp)
             .height(48.dp)
             .let { mod ->
                 if (focusRequester != null) {
@@ -202,14 +202,6 @@ private fun DrawerItem(
                     modifier = Modifier.size(24.dp)
                 )
             }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // 文本
-            Text(
-                text = if (item == DrawerItem.User && isLogin) username else item.displayName,
-                maxLines = 1
-            )
         }
     }
 }
