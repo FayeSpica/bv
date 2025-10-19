@@ -78,7 +78,6 @@ fun DrawerContent2(
         modifier = modifier
             .width(140.dp)
             .fillMaxHeight()
-            .background(Color.Black.copy(alpha = 0.8f))
             .onPreviewKeyEvent { keyEvent ->
                 if (keyEvent.isDpadRight()) {
                     if (keyEvent.isKeyDown()) {
@@ -161,9 +160,6 @@ private fun DrawerItem2(
     avatar: String = "",
     username: String = ""
 ) {
-    val backgroundColor = if (isSelected) Color.Gray else Color.Transparent
-    val textColor = if (isSelected) Color.White else Color.Gray
-
     Surface(
         modifier = modifier
             .width(116.dp)
@@ -177,9 +173,7 @@ private fun DrawerItem2(
             }
             .onFocusChanged { if (it.hasFocus && !isSelected) onItemClick() },
         onClick = onItemClick,
-        colors = androidx.tv.material3.ClickableSurfaceDefaults.colors(
-            containerColor = backgroundColor
-        )
+        colors = androidx.tv.material3.ClickableSurfaceDefaults.colors()
     ) {
         Row(
             modifier = Modifier
@@ -208,7 +202,6 @@ private fun DrawerItem2(
                 Icon(
                     imageVector = item.displayIcon,
                     contentDescription = item.displayName,
-                    tint = textColor,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -218,7 +211,6 @@ private fun DrawerItem2(
             // 文本
             Text(
                 text = if (item == DrawerItem.User && isLogin) username else item.displayName,
-                color = textColor,
                 maxLines = 1
             )
         }
