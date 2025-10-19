@@ -1,7 +1,9 @@
 package dev.aaa1115910.bv.tv.screens.main
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -73,10 +75,6 @@ fun DrawerContent(
         modifier = modifier
             .width(60.dp)
             .fillMaxHeight()
-            .border(
-                border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.3f)),
-                shape = RoundedCornerShape(0.dp)
-            )
             .onPreviewKeyEvent { keyEvent ->
                 if (keyEvent.isDpadRight()) {
                     if (keyEvent.isKeyDown()) {
@@ -87,6 +85,15 @@ fun DrawerContent(
                 false
             }
     ) {
+        // 右边分割线
+        Box(
+            modifier = Modifier
+                .width(1.dp)
+                .fillMaxHeight()
+                .background(Color.Gray.copy(alpha = 0.3f))
+                .align(Alignment.CenterEnd)
+        )
+        
         Column(
             modifier = Modifier
                 .fillMaxHeight()
