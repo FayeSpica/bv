@@ -2,7 +2,7 @@ package dev.aaa1115910.biliapi.entity.user
 
 import bilibili.app.interfaces.v1.CursorItem
 
-//TODO 暂时仅解析 UGC 和 PGC
+//TODO 暂时仅解析 UGC、PGC 和 Live
 data class HistoryData(
     val cursor: Long,
     val data: List<HistoryItem>
@@ -12,14 +12,14 @@ data class HistoryData(
             HistoryData(
                 cursor = data.cursor.viewAt,
                 data = data.list
-                    .filter { it.history.business == "archive" || it.history.business == "pgc" }
+                    .filter { it.history.business == "archive" || it.history.business == "pgc" || it.history.business == "live" }
                     .map { HistoryItem.fromHistoryItem(it) }
             )
 
         fun fromHistoryResponse(data: bilibili.app.interfaces.v1.CursorV2Reply) = HistoryData(
             cursor = data.cursor.max,
             data = data.itemsList
-                .filter { it.cardItemCase == CursorItem.CardItemCase.CARD_UGC || it.cardItemCase == CursorItem.CardItemCase.CARD_OGV }
+                .filter { it.cardItemCase == CursorItem.CardItemCase.CARD_UGC || it.cardItemCase == CursorItem.CardItemCase.CARD_OGV || it.cardItemCase == CursorItem.CardItemCase.CARD_LIVE }
                 .map { HistoryItem.fromHistoryItem(it) }
         )
     }
@@ -56,6 +56,7 @@ data class HistoryItem(
                 type = when (item.history.business) {
                     "archive" -> HistoryItemType.Archive
                     "pgc" -> HistoryItemType.Pgc
+                    "live" -> HistoryItemType.Live
                     else -> HistoryItemType.Unknown
                 }
             )
@@ -66,11 +67,13 @@ data class HistoryItem(
             bvid = when (item.cardItemCase) {
                 CursorItem.CardItemCase.CARD_UGC -> item.cardUgc.bvid
                 CursorItem.CardItemCase.CARD_OGV -> ""
+                CursorItem.CardItemCase.CARD_LIVE -> ""
                 else -> ""
             },
             cid = when (item.cardItemCase) {
                 CursorItem.CardItemCase.CARD_UGC -> item.cardUgc.cid
                 CursorItem.CardItemCase.CARD_OGV -> 0
+                CursorItem.CardItemCase.CARD_LIVE -> 0
                 else -> 0
             },
             kid = item.kid,
@@ -83,26 +86,31 @@ data class HistoryItem(
             cover = when (item.cardItemCase) {
                 CursorItem.CardItemCase.CARD_UGC -> item.cardUgc.cover
                 CursorItem.CardItemCase.CARD_OGV -> item.cardOgv.cover
+                CursorItem.CardItemCase.CARD_LIVE -> item.cardLive.cover
                 else -> ""
             },
             author = when (item.cardItemCase) {
                 CursorItem.CardItemCase.CARD_UGC -> item.cardUgc.name
                 CursorItem.CardItemCase.CARD_OGV -> ""
+                CursorItem.CardItemCase.CARD_LIVE -> item.cardLive.name
                 else -> ""
             },
             duration = when (item.cardItemCase) {
                 CursorItem.CardItemCase.CARD_UGC -> item.cardUgc.duration.toInt()
                 CursorItem.CardItemCase.CARD_OGV -> item.cardOgv.duration.toInt()
+                CursorItem.CardItemCase.CARD_LIVE -> 0
                 else -> 0
             },
             progress = when (item.cardItemCase) {
                 CursorItem.CardItemCase.CARD_UGC -> item.cardUgc.progress.toInt()
                 CursorItem.CardItemCase.CARD_OGV -> item.cardOgv.progress.toInt()
+                CursorItem.CardItemCase.CARD_LIVE -> 0
                 else -> 0
             },
             type = when (item.cardItemCase) {
                 CursorItem.CardItemCase.CARD_UGC -> HistoryItemType.Archive
                 CursorItem.CardItemCase.CARD_OGV -> HistoryItemType.Pgc
+                CursorItem.CardItemCase.CARD_LIVE -> HistoryItemType.Live
                 else -> HistoryItemType.Unknown
             }
         )
@@ -110,5 +118,5 @@ data class HistoryItem(
 }
 
 enum class HistoryItemType {
-    Unknown, Archive, Pgc
+    Unknown, Archive, Pgc, Live
 }
