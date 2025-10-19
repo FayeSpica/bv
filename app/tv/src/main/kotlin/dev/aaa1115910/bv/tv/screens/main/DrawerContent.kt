@@ -90,7 +90,7 @@ fun DrawerContent(
             modifier = Modifier
                 .width(1.dp)
                 .fillMaxHeight()
-                .background(Color.Gray.copy(alpha = 0.3f))
+                .background(Color.Gray.copy(alpha = 0.0f))
                 .align(Alignment.CenterEnd)
         )
         
