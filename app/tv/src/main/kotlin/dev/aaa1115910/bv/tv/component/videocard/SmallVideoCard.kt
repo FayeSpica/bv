@@ -117,11 +117,11 @@ fun SmallVideoCardContent(
                 focusedContainerColor = MaterialTheme.colorScheme.surface,
                 pressedContainerColor = MaterialTheme.colorScheme.surface
             ),
-            shape = CardDefaults.shape(shape = MaterialTheme.shapes.large),
+            shape = CardDefaults.shape(shape = MaterialTheme.shapes.small),
             border = CardDefaults.border(
                 focusedBorder = Border(
                     border = BorderStroke(width = 3.dp, color = MaterialTheme.colorScheme.border),
-                    shape = MaterialTheme.shapes.large
+                    shape = MaterialTheme.shapes.small
                 )
             )
         ) {
@@ -237,7 +237,7 @@ fun CardCover(
     val showInfo by remember { derivedStateOf { width > 160.dp } }
 
     BoxWithConstraints(
-        modifier = modifier.clip(MaterialTheme.shapes.large),
+        modifier = modifier.clip(MaterialTheme.shapes.small),
         contentAlignment = Alignment.BottomCenter
     ) {
         val boxWithConstraintsScope = this
@@ -251,7 +251,7 @@ fun CardCover(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(1.6f)
-                .clip(MaterialTheme.shapes.large),
+                .clip(MaterialTheme.shapes.small),
             model = cover.resizedImageUrl(ImageSize.SmallVideoCardCover),
             contentDescription = null,
             contentScale = ContentScale.FillBounds
