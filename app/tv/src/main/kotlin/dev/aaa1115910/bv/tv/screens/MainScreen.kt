@@ -28,9 +28,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.DrawerValue
-import androidx.tv.material3.NavigationDrawer
-import androidx.tv.material3.rememberDrawerState
 import dev.aaa1115910.bv.R
 import dev.aaa1115910.bv.tv.activities.settings.SettingsActivity
 import dev.aaa1115910.bv.tv.activities.user.FavoriteActivity
@@ -40,7 +37,7 @@ import dev.aaa1115910.bv.tv.activities.user.LoginActivity
 import dev.aaa1115910.bv.tv.activities.user.ToViewActivity
 import dev.aaa1115910.bv.tv.activities.user.UserInfoActivity
 import dev.aaa1115910.bv.tv.component.UserPanel
-import dev.aaa1115910.bv.tv.screens.main.DrawerContent
+import dev.aaa1115910.bv.tv.screens.main.DrawerContent2
 import dev.aaa1115910.bv.tv.screens.main.DrawerItem
 import dev.aaa1115910.bv.tv.screens.main.HomeContent
 import dev.aaa1115910.bv.tv.screens.main.LiveContent
@@ -58,7 +55,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun MainScreen(
+fun MainScreen2(
     modifier: Modifier = Modifier,
     recommendViewModel: RecommendViewModel = koinViewModel(),
     popularViewModel: PopularViewModel = koinViewModel(),
@@ -66,11 +63,10 @@ fun MainScreen(
     userViewModel: UserViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    val logger = KotlinLogging.logger("MainScreen")
+    val logger = KotlinLogging.logger("MainScreen2")
     var showUserPanel by remember { mutableStateOf(false) }
     var lastPressBack: Long by remember { mutableLongStateOf(0L) }
     var selectedDrawerItem by remember { mutableStateOf(DrawerItem.Home) }
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val mainFocusRequester = remember { FocusRequester() }
     val ugcFocusRequester = remember { FocusRequester() }
@@ -112,32 +108,30 @@ fun MainScreen(
         handleBack()
     }
 
-    NavigationDrawer(
-        modifier = modifier,
-        drawerContent = {
-            DrawerContent(
-                isLogin = userViewModel.isLogin,
-                avatar = userViewModel.face,
-                username = userViewModel.username,
-                //avatar = "https://i2.hdslb.com/bfs/face/ef0457addb24141e15dfac6fbf45293ccf1e32ab.jpg",
-                //username = "碧诗",
-                onDrawerItemChanged = { selectedDrawerItem = it },
-                onOpenSettings = {
-                    context.startActivity(Intent(context, SettingsActivity::class.java))
-                },
-                onShowUserPanel = {
-                    showUserPanel = true
-                },
-                onFocusToContent = onFocusToContent,
-                onLogin = {
-                    context.startActivity(Intent(context, LoginActivity::class.java))
-                }
-            )
-        },
-        drawerState = drawerState
-    ) {
+    Box(modifier = modifier.fillMaxSize()) {
+        // 自定义Drawer
+        DrawerContent2(
+            isLogin = userViewModel.isLogin,
+            avatar = userViewModel.face,
+            username = userViewModel.username,
+            onDrawerItemChanged = { selectedDrawerItem = it },
+            onOpenSettings = {
+                context.startActivity(Intent(context, SettingsActivity::class.java))
+            },
+            onShowUserPanel = {
+                showUserPanel = true
+            },
+            onFocusToContent = onFocusToContent,
+            onLogin = {
+                context.startActivity(Intent(context, LoginActivity::class.java))
+            }
+        )
+
+        // 主内容区域
         Box(
             modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 140.dp) // 为drawer留出空间
         ) {
             AnimatedContent(
                 targetState = selectedDrawerItem,
@@ -162,52 +156,53 @@ fun MainScreen(
                     else -> {}
                 }
             }
+        }
 
-            AnimatedVisibility(
-                visible = showUserPanel,
-                enter = fadeIn(),
-                exit = fadeOut()
+        // 用户面板
+        AnimatedVisibility(
+            visible = showUserPanel,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.6f))
             ) {
-                Box(
+                AnimatedVisibility(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.6f))
+                        .align(Alignment.Center),
+                    visible = showUserPanel,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut()
                 ) {
-                    AnimatedVisibility(
+                    UserPanel(
                         modifier = Modifier
-                            .align(Alignment.Center),
-                        visible = showUserPanel,
-                        enter = fadeIn() + scaleIn(),
-                        exit = fadeOut()
-                    ) {
-                        UserPanel(
-                            modifier = Modifier
-                                .padding(12.dp),
-                            username = userViewModel.username,
-                            face = userViewModel.face,
-                            onHide = { showUserPanel = false },
-                            onGoMy = {
-                                context.startActivity(Intent(context, UserInfoActivity::class.java))
-                            },
-                            onGoHistory = {
-                                context.startActivity(Intent(context, HistoryActivity::class.java))
-                            },
-                            onGoFavorite = {
-                                context.startActivity(Intent(context, FavoriteActivity::class.java))
-                            },
-                            onGoFollowing = {
-                                context.startActivity(
-                                    Intent(
-                                        context,
-                                        FollowingSeasonActivity::class.java
-                                    )
+                            .padding(12.dp),
+                        username = userViewModel.username,
+                        face = userViewModel.face,
+                        onHide = { showUserPanel = false },
+                        onGoMy = {
+                            context.startActivity(Intent(context, UserInfoActivity::class.java))
+                        },
+                        onGoHistory = {
+                            context.startActivity(Intent(context, HistoryActivity::class.java))
+                        },
+                        onGoFavorite = {
+                            context.startActivity(Intent(context, FavoriteActivity::class.java))
+                        },
+                        onGoFollowing = {
+                            context.startActivity(
+                                Intent(
+                                    context,
+                                    FollowingSeasonActivity::class.java
                                 )
-                            },
-                            onGoLater = {
-                                context.startActivity(Intent(context, ToViewActivity::class.java))
-                            }
-                        )
-                    }
+                            )
+                        },
+                        onGoLater = {
+                            context.startActivity(Intent(context, ToViewActivity::class.java))
+                        }
+                    )
                 }
             }
         }

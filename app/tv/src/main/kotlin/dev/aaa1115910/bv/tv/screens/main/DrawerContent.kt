@@ -1,13 +1,15 @@
 package dev.aaa1115910.bv.tv.screens.main
 
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -17,17 +19,17 @@ import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.OndemandVideo
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -35,24 +37,17 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.tv.material3.DrawerValue
 import androidx.tv.material3.Icon
-import androidx.tv.material3.NavigationDrawer
-import androidx.tv.material3.NavigationDrawerItem
-import androidx.tv.material3.NavigationDrawerScope
 import androidx.tv.material3.Surface
-import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
-import androidx.tv.material3.rememberDrawerState
 import coil.compose.AsyncImage
 import dev.aaa1115910.bv.ui.theme.BVTheme
-import dev.aaa1115910.bv.util.ifElse
 import dev.aaa1115910.bv.util.isDpadRight
 import dev.aaa1115910.bv.util.isKeyDown
 import kotlinx.coroutines.delay
 
 @Composable
-fun NavigationDrawerScope.DrawerContent(
+fun DrawerContent2(
     modifier: Modifier = Modifier,
     isLogin: Boolean = false,
     avatar: String = "",
@@ -67,19 +62,19 @@ fun NavigationDrawerScope.DrawerContent(
     val centerFocusRequester = remember { FocusRequester() }
     var tabMoved by remember { mutableStateOf(true) }
 
-    LaunchedEffect(selectedItem) {
+    // 处理选中项变化
+    androidx.compose.runtime.LaunchedEffect(selectedItem) {
         tabMoved = false
         delay(200)
         onDrawerItemChanged(selectedItem)
-        // 别急着向右移动焦点，动画还没结束
         delay(200)
         tabMoved = true
     }
 
-    Column(
+    Box(
         modifier = modifier
+            .width(140.dp)
             .fillMaxHeight()
-            .padding(12.dp)
             .onPreviewKeyEvent { keyEvent ->
                 if (keyEvent.isDpadRight()) {
                     if (keyEvent.isKeyDown()) {
@@ -88,102 +83,133 @@ fun NavigationDrawerScope.DrawerContent(
                     }
                 }
                 false
-            },
-        verticalArrangement = Arrangement.SpaceBetween
+            }
     ) {
-        LazyColumn(
+        Column(
             modifier = Modifier
-                .focusRestorer(centerFocusRequester),
-            verticalArrangement = Arrangement.Center
+                .fillMaxHeight()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            listOf(
-                DrawerItem.Home,
-                DrawerItem.Search,
-                DrawerItem.UGC,
-                DrawerItem.PGC,
-                DrawerItem.Live,
-            ).forEach { item ->
-                item {
-                    NavigationDrawerItem(
-                        modifier = Modifier
-                            .onFocusChanged { if (it.hasFocus) selectedItem = item }
-                            .ifElse(
-                                item == DrawerItem.Home,
-                                Modifier.focusRequester(centerFocusRequester)
-                            ),
-                        onClick = { selectedItem = item },
-                        selected = selectedItem == item,
-                        leadingContent = {
-                            Icon(
-                                imageVector = item.displayIcon,
-                                contentDescription = null
-                            )
-                        }
-                    ) {
-                        Text(text = item.displayName)
-                    }
-                }
-            }
-        }
-        Column {
-            NavigationDrawerItem(
-                modifier = Modifier,
-                onClick = {
-                    if (isLogin) {
-                        onShowUserPanel()
-                    } else {
-                        onLogin()
-                    }
-                },
-                selected = selectedItem == DrawerItem.User,
-                leadingContent = {
-                    if (isLogin) {
-                        Surface(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape),
-                            colors = SurfaceDefaults.colors(
-                                containerColor = Color.Gray
-                            )
-                        ) {
-                            AsyncImage(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape),
-                                model = avatar,
-                                contentDescription = null,
-                                contentScale = ContentScale.FillBounds
-                            )
-                        }
-                    } else {
-                        Icon(
-                            imageVector = DrawerItem.User.displayIcon,
-                            contentDescription = null
-                        )
-                    }
-                }
+            // 顶部导航项
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    modifier = Modifier
-                        .basicMarquee(),
-                    text = if (isLogin) username
-                    else DrawerItem.User.displayName,
-                    maxLines = 1
-                )
-            }
-            NavigationDrawerItem(
-                modifier = Modifier,
-                onClick = onOpenSettings,
-                selected = false,
-                leadingContent = {
-                    Icon(
-                        imageVector = DrawerItem.Settings.displayIcon,
-                        contentDescription = null
+                listOf(
+                    DrawerItem.Home,
+                    DrawerItem.Search,
+                    DrawerItem.UGC,
+                    DrawerItem.PGC,
+                    DrawerItem.Live,
+                ).forEach { item ->
+                    DrawerItem2(
+                        item = item,
+                        isSelected = selectedItem == item,
+                        isFocused = selectedItem == item,
+                        onItemClick = { selectedItem = item },
+                        focusRequester = if (item == DrawerItem.Home) centerFocusRequester else null
                     )
                 }
-            ) {
-                Text(text = DrawerItem.Settings.displayName)
             }
+
+            // 底部功能项
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // 用户项
+                DrawerItem2(
+                    item = DrawerItem.User,
+                    isSelected = selectedItem == DrawerItem.User,
+                    isFocused = selectedItem == DrawerItem.User,
+                    onItemClick = {
+                        if (isLogin) {
+                            onShowUserPanel()
+                        } else {
+                            onLogin()
+                        }
+                    },
+                    isLogin = isLogin,
+                    avatar = avatar,
+                    username = username
+                )
+
+                // 设置项
+                DrawerItem2(
+                    item = DrawerItem.Settings,
+                    isSelected = false,
+                    isFocused = false,
+                    onItemClick = onOpenSettings
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DrawerItem2(
+    item: DrawerItem,
+    isSelected: Boolean,
+    isFocused: Boolean,
+    onItemClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    focusRequester: FocusRequester? = null,
+    isLogin: Boolean = false,
+    avatar: String = "",
+    username: String = ""
+) {
+    Surface(
+        modifier = modifier
+            .width(116.dp)
+            .height(48.dp)
+            .let { mod ->
+                if (focusRequester != null) {
+                    mod.focusRequester(focusRequester)
+                } else {
+                    mod
+                }
+            }
+            .onFocusChanged { if (it.hasFocus && !isSelected) onItemClick() },
+        onClick = onItemClick,
+        colors = androidx.tv.material3.ClickableSurfaceDefaults.colors()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 图标
+            if (item == DrawerItem.User && isLogin) {
+                Surface(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape),
+                    color = Color.Gray
+                ) {
+                    AsyncImage(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clip(CircleShape),
+                        model = avatar,
+                        contentDescription = username,
+                        contentScale = ContentScale.FillBounds
+                    )
+                }
+            } else {
+                Icon(
+                    imageVector = item.displayIcon,
+                    contentDescription = item.displayName,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // 文本
+            Text(
+                text = if (item == DrawerItem.User && isLogin) username else item.displayName,
+                maxLines = 1
+            )
         }
     }
 }
@@ -203,28 +229,10 @@ enum class DrawerItem(
 
 @Preview(device = "id:tv_1080p")
 @Composable
-private fun DrawerContentClosedPreview() {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+private fun DrawerContent2Preview() {
     BVTheme {
-        NavigationDrawer(
-            drawerContent = {
-                DrawerContent()
-            },
-            drawerState = drawerState
-        ) { }
-    }
-}
-
-@Preview(device = "id:tv_1080p")
-@Composable
-private fun DrawerContentOpenPreview() {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Open)
-    BVTheme {
-        NavigationDrawer(
-            drawerContent = {
-                DrawerContent()
-            },
-            drawerState = drawerState
-        ) { }
+        Box {
+            DrawerContent2()
+        }
     }
 }
