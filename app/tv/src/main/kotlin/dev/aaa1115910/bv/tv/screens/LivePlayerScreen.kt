@@ -1,10 +1,15 @@
 package dev.aaa1115910.bv.tv.screens
 
 import android.net.Uri
+import android.view.KeyEvent
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,10 +18,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +39,7 @@ import androidx.media3.ui.PlayerView
 import androidx.tv.material3.Text
 import dev.aaa1115910.bv.viewmodel.LivePlayerViewModel
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -37,6 +49,11 @@ fun LivePlayerScreen(
 ) {
     val context = LocalContext.current
     val logger = KotlinLogging.logger { }
+    val focusRequester = remember { FocusRequester() }
+    
+    // 标题显示状态
+    var showTitle by remember { mutableStateOf(true) }
+    var titleVisibilityTrigger by remember { mutableStateOf(0) }
 
     // 创建 ExoPlayer
     val exoPlayer = remember {
@@ -54,6 +71,9 @@ fun LivePlayerScreen(
             exoPlayer.setMediaItem(mediaItem)
             exoPlayer.prepare()
             exoPlayer.play()
+            // 播放开始时显示标题
+            showTitle = true
+            titleVisibilityTrigger++
         }
     }
 
@@ -64,6 +84,19 @@ fun LivePlayerScreen(
         } else {
             exoPlayer.pause()
         }
+    }
+
+    // 标题自动隐藏逻辑
+    LaunchedEffect(titleVisibilityTrigger) {
+        if (titleVisibilityTrigger > 0) {
+            delay(3000) // 3秒后隐藏
+            showTitle = false
+        }
+    }
+
+    // 请求焦点
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 
     // 清理资源
@@ -81,6 +114,18 @@ fun LivePlayerScreen(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Black)
+            .focusRequester(focusRequester)
+            .focusable()
+            .onKeyEvent { keyEvent ->
+                // 任何按键都重新显示标题
+                if (keyEvent.nativeKeyEvent.action == KeyEvent.ACTION_DOWN) {
+                    showTitle = true
+                    titleVisibilityTrigger++
+                    true
+                } else {
+                    false
+                }
+            }
     ) {
         when {
             livePlayerViewModel.isLoading -> {
@@ -134,14 +179,18 @@ fun LivePlayerScreen(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // 标题显示
-                if (livePlayerViewModel.title.isNotEmpty()) {
+                // 标题显示（带动画）
+                AnimatedVisibility(
+                    visible = showTitle && livePlayerViewModel.title.isNotEmpty(),
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier.align(Alignment.TopStart)
+                ) {
                     Text(
                         text = livePlayerViewModel.title,
                         color = Color.White,
                         fontSize = 20.sp,
                         modifier = Modifier
-                            .align(Alignment.TopStart)
                             .padding(32.dp)
                             .background(Color.Black.copy(alpha = 0.5f))
                             .padding(16.dp)
