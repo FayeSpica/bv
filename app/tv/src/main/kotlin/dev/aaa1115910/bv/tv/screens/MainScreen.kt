@@ -43,6 +43,7 @@ import dev.aaa1115910.bv.tv.component.UserPanel
 import dev.aaa1115910.bv.tv.screens.main.DrawerContent
 import dev.aaa1115910.bv.tv.screens.main.DrawerItem
 import dev.aaa1115910.bv.tv.screens.main.HomeContent
+import dev.aaa1115910.bv.tv.screens.main.LiveContent
 import dev.aaa1115910.bv.tv.screens.main.PgcContent
 import dev.aaa1115910.bv.tv.screens.main.UgcContent
 import dev.aaa1115910.bv.tv.screens.search.SearchInputScreen
@@ -74,6 +75,7 @@ fun MainScreen(
     val mainFocusRequester = remember { FocusRequester() }
     val ugcFocusRequester = remember { FocusRequester() }
     val pgcFocusRequester = remember { FocusRequester() }
+    val liveFocusRequester = remember { FocusRequester() }
     val searchFocusRequester = remember { FocusRequester() }
 
     val handleBack = {
@@ -92,6 +94,7 @@ fun MainScreen(
             DrawerItem.Home -> mainFocusRequester.requestFocus()
             DrawerItem.UGC -> ugcFocusRequester.requestFocus()
             DrawerItem.PGC -> pgcFocusRequester.requestFocus()
+            DrawerItem.Live -> liveFocusRequester.requestFocus()
             DrawerItem.Search -> searchFocusRequester.requestFocus()
             else -> {}
         }
@@ -154,6 +157,7 @@ fun MainScreen(
                     DrawerItem.Home -> HomeContent(navFocusRequester = mainFocusRequester)
                     DrawerItem.UGC -> UgcContent(navFocusRequester = ugcFocusRequester)
                     DrawerItem.PGC -> PgcContent(navFocusRequester = pgcFocusRequester)
+                    DrawerItem.Live -> LiveContent(navFocusRequester = liveFocusRequester)
                     DrawerItem.Search -> SearchInputScreen(defaultFocusRequester = searchFocusRequester)
                     else -> {}
                 }

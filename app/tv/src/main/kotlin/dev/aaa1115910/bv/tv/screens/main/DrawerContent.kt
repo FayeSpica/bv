@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LiveTv
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.OndemandVideo
 import androidx.compose.material.icons.filled.Search
@@ -90,7 +92,8 @@ fun NavigationDrawerScope.DrawerContent(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         LazyColumn(
-            modifier = Modifier.focusRestorer(centerFocusRequester),
+            modifier = Modifier
+                .focusRestorer(centerFocusRequester),
             verticalArrangement = Arrangement.Center
         ) {
             listOf(
@@ -98,6 +101,7 @@ fun NavigationDrawerScope.DrawerContent(
                 DrawerItem.Search,
                 DrawerItem.UGC,
                 DrawerItem.PGC,
+                DrawerItem.Live,
             ).forEach { item ->
                 item {
                     NavigationDrawerItem(
@@ -193,6 +197,7 @@ enum class DrawerItem(
     Home(displayName = "首页", displayIcon = Icons.Default.Home),
     UGC(displayName = "UGC", displayIcon = Icons.Default.OndemandVideo),
     PGC(displayName = "PGC", displayIcon = Icons.Default.Movie),
+    Live(displayName = "直播", displayIcon = Icons.Default.LiveTv),
     Settings(displayName = "设置", displayIcon = Icons.Default.Settings), ;
 }
 
