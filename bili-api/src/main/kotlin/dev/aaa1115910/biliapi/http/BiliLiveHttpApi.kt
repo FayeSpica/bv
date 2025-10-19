@@ -3,6 +3,7 @@ package dev.aaa1115910.biliapi.http
 import dev.aaa1115910.biliapi.http.entity.BiliResponse
 import dev.aaa1115910.biliapi.http.entity.live.DanmuInfoData
 import dev.aaa1115910.biliapi.http.entity.live.HistoryDanmaku
+import dev.aaa1115910.biliapi.http.entity.live.LiveStreamUrlData
 import dev.aaa1115910.biliapi.http.entity.live.RoomPlayInfoData
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
@@ -72,6 +73,26 @@ object BiliLiveHttpApi {
     suspend fun getLiveDanmuHistory(roomId: Int): BiliResponse<HistoryDanmaku> =
         client.get("/xlive/web-room/v1/dM/gethistory") {
             parameter("roomid", roomId)
+        }.body()
+
+    /**
+     * 获取直播间[roomId]的播放流地址
+     * @param qn 清晰度 10000:原画 400:蓝光 250:超清 150:高清 80:流畅
+     * @param platform 平台 web/h5
+     */
+    suspend fun getLiveStreamUrl(
+        roomId: Int,
+        qn: Int = 10000,
+        platform: String = "web"
+    ): BiliResponse<LiveStreamUrlData> =
+        client.get("/xlive/web-room/v2/index/getRoomPlayInfo") {
+            parameter("room_id", roomId)
+            parameter("protocol", "0,1")
+            parameter("format", "0,1,2")
+            parameter("codec", "0,1")
+            parameter("qn", qn)
+            parameter("platform", platform)
+            parameter("ptype", 8)
         }.body()
 
 }

@@ -1,7 +1,5 @@
 package dev.aaa1115910.bv.tv.component.videocard
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,6 +33,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import dev.aaa1115910.bv.entity.carddata.VideoCardData
 import dev.aaa1115910.bv.entity.carddata.VideoCardType
+import dev.aaa1115910.bv.tv.activities.video.LivePlayerActivity
 import dev.aaa1115910.bv.util.ifElse
 
 @Composable
@@ -91,10 +90,13 @@ fun VideosRow(
                             VideoCardType.Video -> onOpenVideoInfo(videoData)
                             VideoCardType.Season -> onOpenSeasonInfo(videoData)
                             VideoCardType.Live -> {
-                                // 打开直播间链接
+                                // 打开直播播放器
                                 videoData.roomId?.let { roomId ->
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://live.bilibili.com/$roomId"))
-                                    context.startActivity(intent)
+                                    LivePlayerActivity.actionStart(
+                                        context = context,
+                                        roomId = roomId,
+                                        title = videoData.title
+                                    )
                                 }
                             }
                         }

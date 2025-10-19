@@ -125,6 +125,7 @@ dependencies {
     api(androidx.media3.common)
     api(androidx.media3.decoder)
     api(androidx.media3.exoplayer)
+    api(androidx.media3.exoplayer.hls)
     api(androidx.media3.ui)
     api(androidx.navigation.compose)
     api(androidx.room.ktx)
