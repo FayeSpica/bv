@@ -47,7 +47,7 @@ import dev.aaa1115910.bv.util.isKeyDown
 import kotlinx.coroutines.delay
 
 @Composable
-fun DrawerContent2(
+fun DrawerContent(
     modifier: Modifier = Modifier,
     isLogin: Boolean = false,
     avatar: String = "",
@@ -102,7 +102,7 @@ fun DrawerContent2(
                     DrawerItem.PGC,
                     DrawerItem.Live,
                 ).forEach { item ->
-                    DrawerItem2(
+                    DrawerItem(
                         item = item,
                         isSelected = selectedItem == item,
                         isFocused = selectedItem == item,
@@ -117,7 +117,7 @@ fun DrawerContent2(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 // 用户项
-                DrawerItem2(
+                DrawerItem(
                     item = DrawerItem.User,
                     isSelected = selectedItem == DrawerItem.User,
                     isFocused = selectedItem == DrawerItem.User,
@@ -134,7 +134,7 @@ fun DrawerContent2(
                 )
 
                 // 设置项
-                DrawerItem2(
+                DrawerItem(
                     item = DrawerItem.Settings,
                     isSelected = false,
                     isFocused = false,
@@ -146,7 +146,7 @@ fun DrawerContent2(
 }
 
 @Composable
-private fun DrawerItem2(
+private fun DrawerItem(
     item: DrawerItem,
     isSelected: Boolean,
     isFocused: Boolean,
@@ -229,10 +229,10 @@ enum class DrawerItem(
 
 @Preview(device = "id:tv_1080p")
 @Composable
-private fun DrawerContent2Preview() {
+private fun DrawerContentPreview() {
     BVTheme {
         Box {
-            DrawerContent2()
+            DrawerContent()
         }
     }
 }

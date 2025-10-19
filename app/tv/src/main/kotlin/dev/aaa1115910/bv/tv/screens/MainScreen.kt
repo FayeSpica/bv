@@ -37,7 +37,7 @@ import dev.aaa1115910.bv.tv.activities.user.LoginActivity
 import dev.aaa1115910.bv.tv.activities.user.ToViewActivity
 import dev.aaa1115910.bv.tv.activities.user.UserInfoActivity
 import dev.aaa1115910.bv.tv.component.UserPanel
-import dev.aaa1115910.bv.tv.screens.main.DrawerContent2
+import dev.aaa1115910.bv.tv.screens.main.DrawerContent
 import dev.aaa1115910.bv.tv.screens.main.DrawerItem
 import dev.aaa1115910.bv.tv.screens.main.HomeContent
 import dev.aaa1115910.bv.tv.screens.main.LiveContent
@@ -110,7 +110,7 @@ fun MainScreen2(
 
     Box(modifier = modifier.fillMaxSize()) {
         // 自定义Drawer
-        DrawerContent2(
+        DrawerContent(
             isLogin = userViewModel.isLogin,
             avatar = userViewModel.face,
             username = userViewModel.username,
