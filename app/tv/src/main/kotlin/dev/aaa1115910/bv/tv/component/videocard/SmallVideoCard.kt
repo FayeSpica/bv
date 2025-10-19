@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -38,6 +39,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -205,7 +207,7 @@ private fun CoverBottomInfo(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(12.dp, 8.dp),
+            .padding(6.dp, 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -290,19 +292,24 @@ private fun CardInfo(
     upName: String
 ) {
     Column(
-        modifier = modifier.padding(8.dp)
+        modifier = modifier.padding(2.dp)
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
-            maxLines = 1,
+            style = MaterialTheme.typography.titleSmall.copy(
+                fontWeight = FontWeight.Bold
+            ),
+            minLines = 2,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            UpIcon()
+            UpIcon(
+                modifier = Modifier.size(16.dp)
+            )
             Text(
                 text = upName,
                 style = MaterialTheme.typography.labelMedium,
