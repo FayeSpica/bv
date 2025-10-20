@@ -106,7 +106,8 @@ fun LivePlayerScreen(
         }
     }
 
-    BackHandler {
+    BackHandler(enabled = showTitle) {
+        // 标题显示时，返回键退出
         (context as? androidx.activity.ComponentActivity)?.finish()
     }
 
@@ -117,11 +118,27 @@ fun LivePlayerScreen(
             .focusRequester(focusRequester)
             .focusable()
             .onKeyEvent { keyEvent ->
-                // 任何按键都重新显示标题
-                if (keyEvent.nativeKeyEvent.action == KeyEvent.ACTION_DOWN) {
-                    showTitle = true
-                    titleVisibilityTrigger++
-                    true
+                if (keyEvent.nativeKeyEvent.action == KeyEvent.ACTION_UP) {
+                    logger.info { "keyEvent.nativeKeyEvent.keyCode= ${keyEvent.nativeKeyEvent.keyCode}" }
+                    when (keyEvent.nativeKeyEvent.keyCode) {
+                        KeyEvent.KEYCODE_BACK,
+                        KeyEvent.KEYCODE_BUTTON_B -> {
+                            // 返回键/手柄B键：如果标题隐藏，先显示标题
+                            if (!showTitle) {
+                                showTitle = true
+                                titleVisibilityTrigger++
+                                true  // 消费事件
+                            } else {
+                                false  // 标题已显示，不消费，让 BackHandler 处理退出
+                            }
+                        }
+                        else -> {
+                            // 其他按键：重新显示标题
+                            showTitle = true
+                            titleVisibilityTrigger++
+                            true
+                        }
+                    }
                 } else {
                     false
                 }

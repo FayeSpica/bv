@@ -101,6 +101,7 @@ object BiliLiveHttpApi {
      * 获取关注的正在直播的主播列表
      * @param page 页码，从1开始
      * @param pageSize 每页数量，默认9
+     * @param sessData 登录凭证（Cookie中的SESSDATA）
      * @return 关注的直播列表
      * 
      * 注意：此API需要登录，未登录会返回 code=-101
@@ -109,13 +110,17 @@ object BiliLiveHttpApi {
      */
     suspend fun getLiveFollowing(
         page: Int = 1,
-        pageSize: Int = 9
+        pageSize: Int = 9,
+        sessData: String = ""
     ): BiliResponse<LiveFollowingData> =
         client.get("/xlive/web-ucenter/user/following") {
             parameter("page", page)
             parameter("page_size", pageSize)
             parameter("ignoreRecord", 1)
             parameter("hit_ab", true)
+            if (sessData.isNotEmpty()) {
+                header("Cookie", "SESSDATA=$sessData;")
+            }
         }.body()
 
 }
