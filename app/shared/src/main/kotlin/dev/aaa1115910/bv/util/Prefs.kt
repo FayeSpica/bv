@@ -299,10 +299,6 @@ object Prefs {
             )
         }
 
-    var blacklistUser: Boolean
-        get() = runBlocking { dsm.getPreferenceFlow(PrefKeys.prefBlacklistUserRequest).first() }
-        set(value) = runBlocking { dsm.editPreference(PrefKeys.prefBlacklistUserKey, value) }
-
     var themeType: ThemeType
         get() = runBlocking {
             ThemeType.entries[dsm.getPreferenceFlow(PrefKeys.prefThemeTypeRequest).first()]
@@ -354,7 +350,6 @@ object PrefKeys {
     val prefPreferOfficialCdn = booleanPreferencesKey("prefer_official_cdn")
     val prefDefaultDanmakuMask = booleanPreferencesKey("prefer_enable_webmark")
     val prefEnableFfmpegAudioRenderer = booleanPreferencesKey("enable_ffmpeg_audio_renderer")
-    val prefBlacklistUserKey = booleanPreferencesKey("blacklist_user")
     val prefThemeTypeKey = intPreferencesKey("theme_type")
 
     val prefIsLoginRequest = PreferenceRequest(prefIsLoginKey, false)
@@ -411,6 +406,5 @@ object PrefKeys {
     val prefPreferOfficialCdnRequest = PreferenceRequest(prefPreferOfficialCdn, false)
     val prefDefaultDanmakuMaskRequest = PreferenceRequest(prefDefaultDanmakuMask, false)
     val prefEnableFfmpegEndererRequest = PreferenceRequest(prefEnableFfmpegAudioRenderer, false)
-    val prefBlacklistUserRequest = PreferenceRequest(prefBlacklistUserKey, false)
     val prefThemeTypeRequest = PreferenceRequest(prefThemeTypeKey, ThemeType.Auto.ordinal)
 }

@@ -16,14 +16,10 @@ import dev.aaa1115910.bv.dao.AppDatabase
 import dev.aaa1115910.bv.entity.AuthData
 import dev.aaa1115910.bv.entity.db.UserDB
 import dev.aaa1115910.bv.network.HttpServer
-import dev.aaa1115910.bv.util.BlacklistUtil
 import dev.aaa1115910.bv.util.FirebaseUtil
 import dev.aaa1115910.bv.util.LogCatcherUtil
 import dev.aaa1115910.bv.util.Prefs
 import dev.aaa1115910.bv.util.toast
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -51,10 +47,6 @@ class BVApp : Application() {
         context = this.applicationContext
         HandroidLoggerAdapter.DEBUG = BuildConfig.DEBUG
         dataStoreManager = DataStoreManager(applicationContext.dataStore)
-        if (Prefs.blacklistUser) {
-            R.string.blacklist_user_toast.toast(context)
-            return
-        }
         koinApplication = startKoin {
             androidLogger(if (BuildConfig.DEBUG) Level.ERROR else Level.NONE)
             androidContext(this@BVApp)
@@ -67,7 +59,6 @@ class BVApp : Application() {
         instance = this
         updateMigration()
         HttpServer.startServer()
-        updateBlacklist()
     }
 
     private fun initFirebase() {
@@ -128,13 +119,6 @@ class BVApp : Application() {
             }
         }
         Prefs.lastVersionCode = BuildConfig.VERSION_CODE
-    }
-
-    private fun updateBlacklist() {
-        CoroutineScope(Dispatchers.IO).launch {
-            BlacklistUtil.updateBlacklist(context)
-            BlacklistUtil.checkUid(Prefs.uid)
-        }
     }
 }
 

@@ -10,3 +10,10 @@
 /.idea/jarRepositories.xml
 /.idea/migrations.xml
 /.idea/codeStyles/
+.idea
+/app/default/release
+/bili-api/bin
+/bili-api/grpc/bin
+/bili-subtitle/bin
+/buildSrc/.kotlin/errors
+/libs/ffmpegDecoder/build/.transforms

@@ -10,7 +10,6 @@ import dev.aaa1115910.biliapi.repositories.SendSmsState
 import dev.aaa1115910.bv.BVApp
 import dev.aaa1115910.bv.entity.AuthData
 import dev.aaa1115910.bv.repository.UserRepository
-import dev.aaa1115910.bv.util.BlacklistUtil
 import dev.aaa1115910.bv.util.Prefs
 import dev.aaa1115910.bv.util.fDebug
 import dev.aaa1115910.bv.util.toast
@@ -122,7 +121,6 @@ class SmsLoginViewModel(
                     accessToken = loginResult.accessToken,
                     refreshToken = loginResult.refreshToken
                 )
-                BlacklistUtil.checkUid(Prefs.uid)
                 userRepository.addUser(authData)
 
                 withContext(Dispatchers.Main) {
