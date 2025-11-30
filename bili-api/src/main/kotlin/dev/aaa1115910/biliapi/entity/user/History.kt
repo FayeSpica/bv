@@ -45,9 +45,12 @@ data class HistoryItem(
                 oid = item.history.oid,
                 bvid = item.history.bvid,
                 cid = item.history.cid,
-                kid = 0,
+                kid = item.kid,
                 epid = item.history.epid,
-                seasonId = null,
+                seasonId = when (item.history.business) {
+                    "pgc" -> item.kid.toInt()
+                    else -> null
+                },
                 title = item.title,
                 cover = item.cover,
                 author = item.authorName,

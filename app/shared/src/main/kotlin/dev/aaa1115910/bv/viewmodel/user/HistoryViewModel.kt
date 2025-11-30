@@ -60,7 +60,10 @@ class HistoryViewModel(
             data.data.forEach { historyItem ->
                 histories.addWithMainContext(
                     VideoCardData(
-                        avid = historyItem.oid,
+                        avid = when (historyItem.type) {
+                            dev.aaa1115910.biliapi.entity.user.HistoryItemType.Pgc -> historyItem.seasonId?.toLong() ?: 0L
+                            else -> historyItem.oid
+                        },
                         title = historyItem.title,
                         cover = historyItem.cover,
                         upName = historyItem.author,
