@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -60,20 +61,66 @@ fun LivePlayerScreen(
         ExoPlayer.Builder(context).build().apply {
             repeatMode = Player.REPEAT_MODE_OFF
             playWhenReady = true
+            
+            // 添加播放器监听器，用于检测错误和缓冲状态
+            addListener(object : Player.Listener {
+                override fun onPlayerError(error: PlaybackException) {
+                    logger.warn { "ExoPlayer error: ${error.message}" }
+                    livePlayerViewModel.handlePlayerError()
+                }
+                
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    when (playbackState) {
+                        Player.STATE_BUFFERING -> {
+                            logger.info { "Player is buffering" }
+                            livePlayerViewModel.startBufferingCheck()
+                        }
+                        Player.STATE_READY -> {
+                            logger.info { "Player is ready" }
+                            livePlayerViewModel.stopBufferingCheck()
+                        }
+                        Player.STATE_ENDED -> {
+                            logger.info { "Player ended" }
+                            livePlayerViewModel.stopBufferingCheck()
+                        }
+                        Player.STATE_IDLE -> {
+                            logger.info { "Player is idle" }
+                            livePlayerViewModel.stopBufferingCheck()
+                        }
+                    }
+                }
+            })
         }
     }
 
-    // 监听直播流 URL 变化
-    LaunchedEffect(livePlayerViewModel.liveStreamUrl) {
-        if (livePlayerViewModel.liveStreamUrl.isNotEmpty()) {
+    // 监听直播流 URL 变化和重连状态
+    LaunchedEffect(livePlayerViewModel.liveStreamUrl, livePlayerViewModel.isReconnecting) {
+        if (livePlayerViewModel.liveStreamUrl.isNotEmpty() && !livePlayerViewModel.isReconnecting) {
             logger.info { "Setting live stream URL: ${livePlayerViewModel.liveStreamUrl}" }
-            val mediaItem = MediaItem.fromUri(Uri.parse(livePlayerViewModel.liveStreamUrl))
-            exoPlayer.setMediaItem(mediaItem)
-            exoPlayer.prepare()
-            exoPlayer.play()
-            // 播放开始时显示标题
-            showTitle = true
-            titleVisibilityTrigger++
+            try {
+                // 如果正在播放，先停止
+                if (exoPlayer.isPlaying) {
+                    exoPlayer.stop()
+                }
+                exoPlayer.clearMediaItems()
+                val mediaItem = MediaItem.fromUri(Uri.parse(livePlayerViewModel.liveStreamUrl))
+                exoPlayer.setMediaItem(mediaItem)
+                exoPlayer.prepare()
+                exoPlayer.play()
+                // 播放开始时显示标题
+                showTitle = true
+                titleVisibilityTrigger++
+            } catch (e: Exception) {
+                logger.warn { "Failed to set media item: ${e.message}" }
+                livePlayerViewModel.handlePlayerError()
+            }
+        } else if (livePlayerViewModel.isReconnecting) {
+            logger.info { "Reconnecting to live stream..." }
+            // 停止当前播放
+            if (exoPlayer.isPlaying) {
+                exoPlayer.stop()
+            }
+            exoPlayer.clearMediaItems()
         }
     }
 
@@ -145,15 +192,19 @@ fun LivePlayerScreen(
             }
     ) {
         when {
-            livePlayerViewModel.isLoading -> {
-                // 加载中
+            livePlayerViewModel.isLoading || livePlayerViewModel.isReconnecting -> {
+                // 加载中或重连中
                 Column(
                     modifier = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     CircularProgressIndicator(color = Color.White)
                     Text(
-                        text = "正在加载直播流...",
+                        text = if (livePlayerViewModel.isReconnecting) {
+                            "正在重连直播流... (${livePlayerViewModel.reconnectCount}/${LivePlayerViewModel.MAX_RETRY_COUNT})"
+                        } else {
+                            "正在加载直播流..."
+                        },
                         color = Color.White,
                         fontSize = 16.sp,
                         modifier = Modifier.padding(top = 16.dp)

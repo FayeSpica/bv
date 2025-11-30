@@ -10,6 +10,9 @@ import dev.aaa1115910.bv.util.fInfo
 import dev.aaa1115910.bv.util.fWarn
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
@@ -17,6 +20,9 @@ import org.koin.android.annotation.KoinViewModel
 class LivePlayerViewModel : ViewModel() {
     companion object {
         private val logger = KotlinLogging.logger { }
+        const val MAX_RETRY_COUNT = 1000 // 最大重试次数
+        private const val RETRY_DELAY_MS = 10000L // 重试延迟（毫秒）
+        private const val LONG_BUFFERING_THRESHOLD_MS = 60000L // 长时间缓冲阈值（毫秒）
     }
 
     var roomId: Long by mutableStateOf(0L)
@@ -26,13 +32,31 @@ class LivePlayerViewModel : ViewModel() {
     var isLoading: Boolean by mutableStateOf(true)
     var errorMessage: String by mutableStateOf("")
     var isPlaying: Boolean by mutableStateOf(false)
+    var isReconnecting: Boolean by mutableStateOf(false)
+    var reconnectCount: Int by mutableStateOf(0)
+    
+    private var currentRoomId: Int = 0
+    private var retryJob: Job? = null
+    private var bufferingCheckJob: Job? = null
 
-    fun loadLiveStream(roomId: Int) {
+    fun loadLiveStream(roomId: Int, isRetry: Boolean = false) {
+        // 取消之前的重试任务
+        retryJob?.cancel()
+        bufferingCheckJob?.cancel()
+        
+        if (!isRetry) {
+            currentRoomId = roomId
+            reconnectCount = 0
+        }
+        
         viewModelScope.launch(Dispatchers.IO) {
             isLoading = true
+            if (isRetry) {
+                isReconnecting = true
+            }
             errorMessage = ""
             runCatching {
-                logger.fInfo { "Loading live stream for room $roomId" }
+                logger.fInfo { "Loading live stream for room $roomId ${if (isRetry) "(retry $reconnectCount)" else ""}" }
                 
                 // 获取直播间信息
                 val roomInfo = BiliLiveHttpApi.getLiveRoomPlayInfo(roomId)
@@ -48,6 +72,7 @@ class LivePlayerViewModel : ViewModel() {
                             else -> "直播间状态异常"
                         }
                         isLoading = false
+                        isReconnecting = false
                         return@launch
                     }
                 }
@@ -79,24 +104,98 @@ class LivePlayerViewModel : ViewModel() {
                             liveStreamUrl = url
                             logger.fInfo { "Live stream URL obtained: $url" }
                             isLoading = false
+                            isReconnecting = false
                             isPlaying = true
+                            reconnectCount = 0 // 重置重连计数
                         } else {
                             errorMessage = "无法获取直播流地址"
                             isLoading = false
+                            isReconnecting = false
+                            if (isRetry) {
+                                tryReconnect()
+                            }
                         }
                     } ?: run {
                         errorMessage = "无法解析直播流信息"
                         isLoading = false
+                        isReconnecting = false
+                        if (isRetry) {
+                            tryReconnect()
+                        }
                     }
                 } ?: run {
                     errorMessage = "直播流信息为空"
                     isLoading = false
+                    isReconnecting = false
+                    if (isRetry) {
+                        tryReconnect()
+                    }
                 }
             }.onFailure { e ->
                 logger.fWarn { "Failed to load live stream: ${e.stackTraceToString()}" }
                 errorMessage = "加载直播流失败: ${e.message}"
                 isLoading = false
+                isReconnecting = false
+                if (isRetry) {
+                    tryReconnect()
+                }
             }
+        }
+    }
+    
+    /**
+     * 尝试重连
+     */
+    fun tryReconnect() {
+        if (reconnectCount >= MAX_RETRY_COUNT) {
+            logger.fWarn { "Max retry count reached, stop reconnecting" }
+            errorMessage = "重连失败，已达到最大重试次数"
+            isReconnecting = false
+            return
+        }
+        
+        reconnectCount++
+        logger.fInfo { "Scheduling reconnect attempt $reconnectCount/$MAX_RETRY_COUNT after ${RETRY_DELAY_MS}ms" }
+        
+        retryJob = viewModelScope.launch(Dispatchers.IO) {
+            delay(RETRY_DELAY_MS)
+            if (isActive && currentRoomId > 0) {
+                loadLiveStream(currentRoomId, isRetry = true)
+            }
+        }
+    }
+    
+    /**
+     * 开始监控缓冲状态
+     */
+    fun startBufferingCheck() {
+        bufferingCheckJob?.cancel()
+        bufferingCheckJob = viewModelScope.launch(Dispatchers.IO) {
+            delay(LONG_BUFFERING_THRESHOLD_MS)
+            // 如果长时间缓冲，尝试重连
+            if (isActive && isPlaying && reconnectCount < MAX_RETRY_COUNT) {
+                logger.fInfo { "Long buffering detected, attempting reconnect" }
+                tryReconnect()
+            }
+        }
+    }
+    
+    /**
+     * 停止监控缓冲状态
+     */
+    fun stopBufferingCheck() {
+        bufferingCheckJob?.cancel()
+    }
+    
+    /**
+     * 处理播放器错误
+     */
+    fun handlePlayerError() {
+        logger.fWarn { "Player error detected, attempting reconnect" }
+        if (reconnectCount < MAX_RETRY_COUNT && currentRoomId > 0) {
+            tryReconnect()
+        } else {
+            errorMessage = "播放器错误，重连失败"
         }
     }
 
@@ -112,7 +211,10 @@ class LivePlayerViewModel : ViewModel() {
 
     fun release() {
         // 释放资源
+        retryJob?.cancel()
+        bufferingCheckJob?.cancel()
         isPlaying = false
+        isReconnecting = false
     }
 }
 
