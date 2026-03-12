@@ -142,6 +142,7 @@ object BiliHttpApi {
                     host = endPoint
                     protocol = URLProtocol.HTTPS
                 }
+                header("referer", "https://www.bilibili.com")
             }
         }.apply {
             encApiSign()
